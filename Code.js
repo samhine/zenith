@@ -36,13 +36,13 @@ function getSummonerByAccountId(account_id){
 /**
  * Retrives matches for a certain account ID. Riot API documentation here: https://developer.riotgames.com/apis#match-v4/GET_getMatchlist.
  *
- * @param {string} account_id ID for a summoner.
- * @param {string} champion_ids of champion IDs for filtering the matchlist (comma delimited).
- * @param {string} queue_ids of queue IDs for filtering the matchlist (comma delimited).
- * @param {string} end_time end time to use for filtering matchlist specified as epoch milliseconds.
- * @param {string} begin_time begin time to use for filtering matchlist specified as epoch milliseconds. 
- * @param {string} end_index end index to use for filtering matchlist. If beginIndex is specified, but not endIndex, then endIndex defaults to beginIndex+100. If endIndex is specified, but not beginIndex, then beginIndex defaults to 0. If both are specified, then endIndex must be greater than beginIndex. The maximum range allowed is 100.
- * @param {string} begin_index begin index to use for filtering matchlist. If beginIndex is specified, but not endIndex, then endIndex defaults to beginIndex+100. If endIndex is specified, but not beginIndex, then beginIndex defaults to 0. If both are specified, then endIndex must be greater than beginIndex. The maximum range allowed is 100.
+ * @param {text} account_id ID for a summoner.
+ * @param {text} champion_ids of champion IDs for filtering the matchlist (comma delimited).
+ * @param {text} queue_ids of queue IDs for filtering the matchlist (comma delimited).
+ * @param {text} end_time end time to use for filtering matchlist specified as epoch milliseconds.
+ * @param {text} begin_time begin time to use for filtering matchlist specified as epoch milliseconds. 
+ * @param {text} end_index end index to use for filtering matchlist. If beginIndex is specified, but not endIndex, then endIndex defaults to beginIndex+100. If endIndex is specified, but not beginIndex, then beginIndex defaults to 0. If both are specified, then endIndex must be greater than beginIndex. The maximum range allowed is 100.
+ * @param {text} begin_index begin index to use for filtering matchlist. If beginIndex is specified, but not endIndex, then endIndex defaults to beginIndex+100. If endIndex is specified, but not beginIndex, then beginIndex defaults to 0. If both are specified, then endIndex must be greater than beginIndex. The maximum range allowed is 100.
  * @return Table containing matchlist of specified account with given parameters.
  * @customfunction
  */
