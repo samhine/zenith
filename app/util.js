@@ -1,26 +1,3 @@
-/**
- * Retrives Riot API key from Credentials tab of current document.
- * 
- * @return 
- */
-
-function retrieveRiotApiKey(){
-    var range = SpreadsheetApp.getActiveSheet().getRange('Credentials!B2');
-    var value = range.getValue();
-    return value
-}
-
-/**
- * Retrives region information from Credentials tab of current document.
- * 
- * @return 
- */
-  
-function retrieveRegion(){
-    var range = SpreadsheetApp.getActiveSheet().getRange('Credentials!A2');
-    var value = range.getValue();
-    return value
-}
 
 /**
  * Makes request to API with given region, query and API key (secret)
@@ -32,7 +9,7 @@ function retrieveRegion(){
  */
 
 function makeRiotApiCall(region, query, secret){
-    if (query.endsWith("&")) var url = "https://"+region+".api.riotgames.com"+query+"api_key="+secret;
+    if (query.endsWith("&") || query.endsWith("?")) var url = "https://"+region+".api.riotgames.com"+query+"api_key="+secret;
     else var url = "https://"+region+".api.riotgames.com"+query+"?api_key="+secret;
 
     var response = UrlFetchApp.fetch(url, {'muteHttpExceptions': true});

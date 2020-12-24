@@ -1,6 +1,3 @@
-import makeRiotApiCall from 'util';
-import {API_KEY, REGION} from 'Main';
-
 /**
  * Retrieves matches for a certain account ID. Riot API documentation here: https://developer.riotgames.com/apis#match-v4/GET_getMatchlist.
  *

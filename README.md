@@ -4,7 +4,7 @@ Google Sheets add-on to assist in use of Riot API.
 
 # Development and deployment
 
-This repository can be cloned using 
+This repository can be cloned using
 
 ```
 git clone git@github.com:samhine/zenith.git
@@ -20,6 +20,6 @@ clasp login
 After you make changes you can deploy using the following
 
 ```
+cd app
 clasp push
 ```
-

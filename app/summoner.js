@@ -1,4 +1,3 @@
-
 /**
  * Retrieves account ID for a given summoner name.
  * 
@@ -7,7 +6,7 @@
  * @customfunction
  */
 function getAccountIdBySummoner(summoner_name){
-    var data = makeRiotApiCall("/lol/summoner/v4/summoners/by-name/"+summoner_name)
+    var data = makeRiotApiCall(REGION, "/lol/summoner/v4/summoners/by-name/"+summoner_name, API_KEY)
     return data.accountId
 }
 
@@ -17,6 +16,6 @@ function getAccountIdBySummoner(summoner_name){
  * @param {text} account_id Account ID of summmoner.
  */
 function getSummonerByAccountId(account_id){
-    var data = makeRiotApiCall("/lol/summoner/v4/summoners/by-account/"+account_id)
+    var data = makeRiotApiCall(REGION, "/lol/summoner/v4/summoners/by-account/"+account_id, API_KEY)
     return data.name
 }
