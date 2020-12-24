@@ -97,13 +97,40 @@ function getTimelineByGameId(game_id){
  * @param {text} champion_name 
  * @param {text} statistic 
  */
+
 function getStatForChampion(match_id, champion_name, statistic){
     match_data = getMatchByGameId(match_id)
     timeline_data = getTimelineByGameId(match_id)
     participant_id = participantIdForChampion(match_id, champion_name)
-
-    valid_stats = ["kills", "deaths", "assists", "totalGold", "goldPerMin", "cs", "csPerMin"]
     
+    return getStatisticForParticipant(match_data, participant_id, statistic)
+}
+
+/**
+ * Parses match for chosen statistic and returns it for given summoner.
+ * 
+ * @param {text} match_id 
+ * @param {text} summoner_name 
+ * @param {text} statistic 
+ */
+
+function getStatForSummoner(match_id, summoner_name, statistic){
+    match_data = getMatchByGameId(match_id)
+    timeline_data = getTimelineByGameId(match_id)
+    participant_id = participantIdForSummoner(match_id, summoner_name)
+
+    return getStatisticForParticipant(match_data, participant_id, statistic)
+}
+
+/**
+ * Parses match for chosen statistic and returns it for given participant.
+ * 
+ * @param {text} match_id 
+ * @param {text} participant_id 
+ * @param {text} statistic 
+ */
+
+function getStatisticForParticipant(match_data, participant_id, statistic){
     switch(statistic) {
         case "kills":
             return getKillsForParticipant(match_data, participant_id);
@@ -119,24 +146,21 @@ function getStatForChampion(match_id, champion_name, statistic){
             return getCsForParticipant(match_data, participant_id);
         case "csPerMin":
             return getCsPerMinForParticipant(match_data, participant_id);
+        case "damage":
+            return getDamageForParticipant(match_data, participant_id);
+        case "damagePerMin":
+            return getDamagePerMinForParticipant(match_data, participant_id);
         default:
             return "Statistic is invalid!"
-      }
+    }
 }
 
 /**
- * Parses match for chosen statistic and returns it for given summoner.
+ * Finds participant ID for a given summoner name within a match.
  * 
  * @param {text} match_id 
  * @param {text} summoner_name 
- * @param {text} statistic 
  */
-function getStatForSummoner(match_id, summoner_name, statistic){
-    match_data = getMatchByGameId(match_id)
-    timeline_data = getTimelineByGameId(match_id)
-    participant_id = participantIdForSummoner(match_id, summoner_name)
-
-}
 
 function participantIdForSummoner(match_id, summoner_name){
     match_data = getMatchByGameId(match_id);
@@ -145,9 +169,62 @@ function participantIdForSummoner(match_id, summoner_name){
     return match_data["participantIdentities"].find(player => player["player"]["currentAccountId"]==account_id)["participantId"]
 }
 
+/**
+ * Finds participant ID for a given champion name within a match.
+ * 
+ * @param {text} match_id 
+ * @param {text} champion_name 
+ */
+
 function participantIdForChampion(match_id, champion_name){
     match_data = getMatchByGameId(match_id);
     champion_id = getChampionInfoByName(champion_name)["key"];
 
     return match_data["participants"].find(player => player["championId"]==champion_id)["participantId"]
+}
+
+function getBaseStatsForParticipant(match_data, participant_id){
+    return match_data["participants"].find(player => player["participantId"]==participant_id)["stats"]
+}
+
+function getKillsForParticipant(match_data, participant_id) {
+    return getBaseStatsForParticipant(match_data, participant_id)["kills"]
+}
+
+function getDeathsForParticipant(match_data, participant_id) {
+    return getBaseStatsForParticipant(match_data, participant_id)["deaths"]
+}
+
+function getAssistsForParticipant(match_data, participant_id) {
+    return getBaseStatsForParticipant(match_data, participant_id)["assists"]
+}
+
+function getTotalGoldForParticipant(match_data, participant_id) {
+    return getBaseStatsForParticipant(match_data, participant_id)["goldEarned"]
+}
+
+function getGoldPerMinForParticipant(match_data, participant_id) {
+    minutes = match_data["gameDuration"]/60
+    total_gold = getTotalGoldForParticipant(match_data, participant_id)
+    return total_gold/minutes
+}
+
+function getCsForParticipant(match_data, participant_id) {
+    return getBaseStatsForParticipant(match_data, participant_id)["totalMinionsKilled"]
+}
+
+function getCsPerMinForParticipant(match_data, participant_id) {
+    minutes = match_data["gameDuration"]/60
+    total_cs = getCsForParticipant(match_data, participant_id)
+    return total_cs/minutes
+}
+
+function getDamageForParticipant(match_data, participant_id) {
+    return getBaseStatsForParticipant(match_data, participant_id)["totalDamageDealt"]
+}
+
+function getDamagePerMinForParticipant(match_data, participant_id) {
+    minutes = match_data["gameDuration"]/60
+    total_dmg = getDamageForParticipant(match_data, participant_id)
+    return total_dmg/minutes
 }
