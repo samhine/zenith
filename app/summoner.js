@@ -7,6 +7,7 @@
  */
 function getAccountIdBySummoner(summoner_name){
     var data = makeRiotApiCall(REGION, "/lol/summoner/v4/summoners/by-name/"+summoner_name, API_KEY)
+    Logger.log(JSON.stringify(data));
     return data.accountId
 }
 

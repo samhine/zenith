@@ -63,12 +63,8 @@ function getMatchlistsByAccountId(account_id, champion_ids, queue_ids, end_time,
  */
 
 function getMatchByGameId(game_id){
-    if(match_cache.hasOwnProperty(game_id)){
-        return match_cache.game_id
-    }
     var query = "/lol/match/v4/matches/"+game_id;
     var data = makeRiotApiCall(REGION, query, API_KEY);
-    match_cache.game_id = data
     return data
 }
 
@@ -80,12 +76,8 @@ function getMatchByGameId(game_id){
  */
 
 function getTimelineByGameId(game_id){
-    if(timeline_cache.hasOwnProperty(game_id)){
-        return timeline_cache.game_id
-    }
     var query = "/lol/match/v4/timelines/by-match/"+game_id;
     var data = makeRiotApiCall(REGION, query, API_KEY);
-    timeline_cache.game_id = data
     return data
 }
 
