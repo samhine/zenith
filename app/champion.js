@@ -24,7 +24,7 @@ function requestDataDragonChampionData(){
 
 function getChampionInfoById(champion_id){
     for (var name in CHAMPION_DATA){
-        if (CHAMPION_DATA[name]['key']=champion_id){
+        if (CHAMPION_DATA[name]['key']==champion_id){
             return CHAMPION_DATA[name];
         }
     }

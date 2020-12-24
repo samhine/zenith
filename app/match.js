@@ -96,6 +96,7 @@ function getTimelineByGameId(game_id){
  * @param {text} match_id 
  * @param {text} champion_name 
  * @param {text} statistic 
+ * @customfunction
  */
 
 function getStatForChampion(match_id, champion_name, statistic){
@@ -112,6 +113,7 @@ function getStatForChampion(match_id, champion_name, statistic){
  * @param {text} match_id 
  * @param {text} summoner_name 
  * @param {text} statistic 
+ * @customfunction
  */
 
 function getStatForSummoner(match_id, summoner_name, statistic){
@@ -132,6 +134,8 @@ function getStatForSummoner(match_id, summoner_name, statistic){
 
 function getStatisticForParticipant(match_data, participant_id, statistic){
     switch(statistic) {
+        case "champion":
+            return getChampionForParticipant(match_data, participant_id);
         case "kills":
             return getKillsForParticipant(match_data, participant_id);
         case "deaths":
@@ -183,8 +187,19 @@ function participantIdForChampion(match_id, champion_name){
     return match_data["participants"].find(player => player["championId"]==champion_id)["participantId"]
 }
 
+/**
+ * Provides JSON of Riot provided statistics which do not require calculation
+ * 
+ * @param {text} match_data 
+ * @param {text} participant_id 
+ */
 function getBaseStatsForParticipant(match_data, participant_id){
     return match_data["participants"].find(player => player["participantId"]==participant_id)["stats"]
+}
+
+function getChampionForParticipant(match_data, participant_id) {
+    champion_id = match_data["participants"].find(player => player["participantId"]==participant_id)["championId"]
+    return getChampionInfoById(champion_id)["name"]
 }
 
 function getKillsForParticipant(match_data, participant_id) {
