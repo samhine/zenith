@@ -117,3 +117,17 @@ function getStatForSummoner(match_id, summoner_name, statistic){
 
 
 }
+
+function participantIdForSummoner(match_id, summoner_name){
+    match_data = getMatchByGameId(match_id);
+    account_id = getAccountIdBySummoner(summoner_name);
+
+    return match_data["participantIdentities"].find(player => player["player"]["currentAccountId"]==account_id)["participantId"]
+}
+
+function participantIdForChampion(match_id, champion_name){
+    match_data = getMatchByGameId(match_id);
+    champion_id = getChampionInfoByName(champion_name)["key"];
+
+    return match_data["participants"].find(player => player["championId"]==champion_id)["participantId"]
+}
