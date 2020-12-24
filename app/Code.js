@@ -1,10 +1,17 @@
 API_KEY = retrieveRiotApiKey()
 REGION = retrieveRegion()
 
+// Whenever we're about to make a request to the API (for match data)
+// * Check if the match ID is included within the beloow
+// * Push it to the cache if not
+// * TODO: Check memory limit on Google App Scripts
+match_cache = {}
+timeline_cache = {}
+
 /**
  * Retrives Riot API key from Credentials tab of current document.
  * 
- * @return 
+ * @return User specified Riot API key
  */
 
 function retrieveRiotApiKey(){
@@ -16,7 +23,7 @@ function retrieveRiotApiKey(){
 /**
  * Retrives region information from Credentials tab of current document.
  * 
- * @return 
+ * @return User specified platform/region
  */
   
 function retrieveRegion(){
