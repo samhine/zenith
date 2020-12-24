@@ -91,7 +91,7 @@ function getTimelineByGameId(game_id){
 
 
 /**
- * Parses match for chosen statistic and returns it for given champion
+ * Parses match for chosen statistic and returns it for given champion.
  * 
  * @param {text} match_id 
  * @param {text} champion_name 
@@ -100,12 +100,32 @@ function getTimelineByGameId(game_id){
 function getStatForChampion(match_id, champion_name, statistic){
     match_data = getMatchByGameId(match_id)
     timeline_data = getTimelineByGameId(match_id)
+    participant_id = participantIdForChampion(match_id, champion_name)
 
-
+    valid_stats = ["kills", "deaths", "assists", "totalGold", "goldPerMin", "cs", "csPerMin"]
+    
+    switch(statistic) {
+        case "kills":
+            return getKillsForParticipant(match_data, participant_id);
+        case "deaths":
+            return getDeathsForParticipant(match_data, participant_id);
+        case "assists":
+            return getAssistsForParticipant(match_data, participant_id);
+        case "totalGold":
+            return getTotalGoldForParticipant(match_data, participant_id);
+        case "goldPerMin":
+            return getGoldPerMinForParticipant(match_data, participant_id);
+        case "cs":
+            return getCsForParticipant(match_data, participant_id);
+        case "csPerMin":
+            return getCsPerMinForParticipant(match_data, participant_id);
+        default:
+            return "Statistic is invalid!"
+      }
 }
 
 /**
- * Parses match for chosen statistic and returns it for given summoner
+ * Parses match for chosen statistic and returns it for given summoner.
  * 
  * @param {text} match_id 
  * @param {text} summoner_name 
@@ -114,7 +134,7 @@ function getStatForChampion(match_id, champion_name, statistic){
 function getStatForSummoner(match_id, summoner_name, statistic){
     match_data = getMatchByGameId(match_id)
     timeline_data = getTimelineByGameId(match_id)
-
+    participant_id = participantIdForSummoner(match_id, summoner_name)
 
 }
 
