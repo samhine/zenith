@@ -1,0 +1,1 @@
+* Make variables required (such as match_id). 403 errors resulting from incorrect query params are quite misleading.
