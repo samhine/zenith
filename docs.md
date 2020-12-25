@@ -8,7 +8,7 @@ To use Zenith, you will your own Riot API key. To do this, follow the "Get Start
 
 ## Set up
 
-To get started you will need to create a `Credentials` tab within your sheet to which Zenith is connected
+To get started you will need to create a `Credentials` tab within your sheet to which Zenith is connected. Then place;
 
 - your chosen region/platform in cell _A2_. You can find a list of supported regions [here](https://developer.riotgames.com/docs/lol#_routing-values).
 - your Riot API key in cell _B2_. Zenith stores your API key to be sent off with your requests - it is _never_ stored persistently.
