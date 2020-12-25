@@ -6,6 +6,9 @@
  * @customfunction
  */
 function getAccountIdBySummoner(summoner_name) {
+  if (!summoner_name) {
+    throw new Error("Summoner name not provided.");
+  }
   var data = makeRiotApiCall(
     REGION,
     "/lol/summoner/v4/summoners/by-name/" + summoner_name,
@@ -21,6 +24,9 @@ function getAccountIdBySummoner(summoner_name) {
  * @param {text} account_id Account ID of summmoner.
  */
 function getSummonerByAccountId(account_id) {
+  if (!account_id) {
+    throw new Error("Account ID not provided.");
+  }
   var data = makeRiotApiCall(
     REGION,
     "/lol/summoner/v4/summoners/by-account/" + account_id,

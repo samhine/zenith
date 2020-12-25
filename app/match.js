@@ -1,3 +1,5 @@
+const CHAMPION_NAMES = getAllChampionNames();
+
 /**
  * Retrieves matches for a certain account ID. Riot API documentation here: https://developer.riotgames.com/apis#match-v4/GET_getMatchlist.
  *
@@ -117,10 +119,34 @@ function getTimelineByGameId(game_id) {
  */
 
 function getStatForChampion(match_id, champion_name, statistic) {
-  match_data = getMatchByGameId(match_id);
-  timeline_data = getTimelineByGameId(match_id);
-  participant_id = participantIdForChampion(match_id, champion_name);
+  // Hint to correct formats?
+  if (match_id == null || champion_name == null || statistic == null) {
+    throw new Error("Missing field.");
+  } else if (!CHAMPION_NAMES.includes(champion_name)) {
+    throw new Error("Champion not found.");
+  }
 
+  try {
+    match_data = getMatchByGameId(match_id);
+  } catch (err) {
+    throw new Error("Error getting match data:" + err.toString());
+  }
+
+  try {
+    timeline_data = getTimelineByGameId(match_id);
+  } catch (err) {
+    throw new Error("Error getting timeline data:" + err.toString());
+  }
+
+  try {
+    participant_id = participantIdForChampion(match_id, champion_name);
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error("Champion not found in match.");
+    } else {
+      throw err;
+    }
+  }
   return getStatisticForParticipant(match_data, participant_id, statistic);
 }
 
@@ -134,9 +160,30 @@ function getStatForChampion(match_id, champion_name, statistic) {
  */
 
 function getStatForSummoner(match_id, summoner_name, statistic) {
-  match_data = getMatchByGameId(match_id);
-  timeline_data = getTimelineByGameId(match_id);
-  participant_id = participantIdForSummoner(match_id, summoner_name);
+  if (match_id == null || summoner_name == null || statistic == null) {
+    throw new Error("Missing field.");
+  }
+
+  try {
+    match_data = getMatchByGameId(match_id);
+  } catch (err) {
+    throw new Error("Error getting match data:" + err.toString());
+  }
+
+  try {
+    timeline_data = getTimelineByGameId(match_id);
+  } catch (err) {
+    throw new Error("Error getting timeline data:" + err.toString());
+  }
+  try {
+    participant_id = participantIdForSummoner(match_id, summoner_name);
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error("Summoner not found in match.");
+    } else {
+      throw err;
+    }
+  }
 
   return getStatisticForParticipant(match_data, participant_id, statistic);
 }
@@ -172,7 +219,7 @@ function getStatisticForParticipant(match_data, participant_id, statistic) {
     case "damagePerMin":
       return getDamagePerMinForParticipant(match_data, participant_id);
     default:
-      return "Statistic is invalid!";
+      throw new Error("Statistic not valid.");
   }
 }
 
