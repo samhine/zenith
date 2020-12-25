@@ -115,6 +115,7 @@ function getTimelineByGameId(game_id) {
  * @param {text} match_id
  * @param {text} champion_name
  * @param {text} statistic
+ * @return {text} Statistic for champion in provided match.
  * @customfunction
  */
 
@@ -156,6 +157,7 @@ function getStatForChampion(match_id, champion_name, statistic) {
  * @param {text} match_id
  * @param {text} summoner_name
  * @param {text} statistic
+ * @return {text} Statistic for summoner in provided match.
  * @customfunction
  */
 
@@ -336,6 +338,7 @@ function getDamagePerMinForParticipant(match_data, participant_id) {
  *
  * @param {text} match_id ID of match
  * @param {text|undefined} side Side for which champions will be returned ("blue" or "red")
+ * @return {range} List of champions for given match.
  * @customfunction
  */
 
@@ -366,6 +369,7 @@ function getChampionListForMatch(match_id, side) {
  *
  * @param {text} match_id ID of match
  * @param {text|undefined} side Side for which summoners will be returned ("blue" or "red")
+ * @return {range} List of summoners for given match.
  * @customfunction
  */
 

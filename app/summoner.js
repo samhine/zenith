@@ -2,7 +2,7 @@
  * Retrieves account ID for a given summoner name.
  *
  * @param {text} summoner_name Name of summmoner.
- * @return Account ID for provided summoner name.
+ * @return {text} Account ID for provided summoner name.
  * @customfunction
  */
 function getAccountIdBySummoner(summoner_name) {
@@ -22,6 +22,7 @@ function getAccountIdBySummoner(summoner_name) {
  * Retrieves summmoner name for a given account ID.
  *
  * @param {text} account_id Account ID of summmoner.
+ * @return {text} Summoner name for provided account ID.
  */
 function getSummonerByAccountId(account_id) {
   if (!account_id) {
