@@ -175,15 +175,8 @@ function getStatForSummoner(match_id, summoner_name, statistic) {
   } catch (err) {
     throw new Error("Error getting timeline data:" + err.toString());
   }
-  try {
-    participant_id = participantIdForSummoner(match_id, summoner_name);
-  } catch (err) {
-    if (err instanceof TypeError) {
-      throw new Error("Summoner not found in match.");
-    } else {
-      throw err;
-    }
-  }
+
+  participant_id = participantIdForSummoner(match_id, summoner_name);
 
   return getStatisticForParticipant(match_data, participant_id, statistic);
 }
@@ -218,6 +211,8 @@ function getStatisticForParticipant(match_data, participant_id, statistic) {
       return getDamageForParticipant(match_data, participant_id);
     case "damagePerMin":
       return getDamagePerMinForParticipant(match_data, participant_id);
+    case "kdr":
+      return getKdrForParticipant(match_data, participant_id);
     default:
       throw new Error("Statistic not valid.");
   }
@@ -234,9 +229,15 @@ function participantIdForSummoner(match_id, summoner_name) {
   match_data = getMatchByGameId(match_id);
   account_id = getAccountIdBySummoner(summoner_name);
 
-  return match_data["participantIdentities"].find(
+  participant_info = match_data["participantIdentities"].find(
     (player) => player["player"]["currentAccountId"] == account_id
-  )["participantId"];
+  );
+
+  if (participant_info == undefined) {
+    throw new Error("Summoner not found in match");
+  }
+
+  return participant_info["participantId"];
 }
 
 /**
@@ -272,6 +273,16 @@ function getChampionForParticipant(match_data, participant_id) {
     (player) => player["participantId"] == participant_id
   )["championId"];
   return getChampionInfoById(champion_id)["name"];
+}
+
+function getKdrForParticipant(match_data, participant_id) {
+  return (
+    getKillsForParticipant(match_data, participant_id) +
+    "/" +
+    getDeathsForParticipant(match_data, participant_id) +
+    "/" +
+    getAssistsForParticipant(match_data, participant_id)
+  );
 }
 
 function getKillsForParticipant(match_data, participant_id) {
@@ -318,4 +329,67 @@ function getDamagePerMinForParticipant(match_data, participant_id) {
   minutes = match_data["gameDuration"] / 60;
   total_dmg = getDamageForParticipant(match_data, participant_id);
   return total_dmg / minutes;
+}
+
+/**
+ * Champion list for given match. If side is undefined, all champions are returned with blue side champions listed first.
+ *
+ * @param {text} match_id ID of match
+ * @param {text|undefined} side Side for which champions will be returned ("blue" or "red")
+ * @customfunction
+ */
+
+function getChampionListForMatch(match_id, side) {
+  match_data = getMatchByGameId(match_id);
+  if (side != null && side != "blue" && side != "red") {
+    throw new Error("Invalid side selection.");
+  }
+
+  participant_data = match_data["participants"];
+  if (side == null) {
+    return participant_data.map((p) => {
+      return [getChampionInfoById(p["championId"])["name"]];
+    });
+  }
+
+  side_id = side == "blue" ? 100 : 200;
+
+  return participant_data.map((p) => {
+    if (p["teamId"] == side_id) {
+      return [getChampionInfoById(p["championId"])["name"]];
+    }
+  });
+}
+
+/**
+ * Summoner list for given match. If side is undefined, all summoners are returned with blue side summoners listed first. Note, this method will NOT work for custom games since indentity information is not given by the API.
+ *
+ * @param {text} match_id ID of match
+ * @param {text|undefined} side Side for which summoners will be returned ("blue" or "red")
+ * @customfunction
+ */
+
+function getSummonerListForMatch(match_id, side) {
+  match_data = getMatchByGameId(match_id);
+  if (side != null && side != "blue" && side != "red") {
+    throw new Error("Invalid side selection.");
+  }
+
+  participant_indentities = match_data["participantIdentities"];
+
+  // for (var p in participant_indentities) {
+  //   all_summoner_names.push([participant_indentities[p]["summonerName"]]);
+  // }
+
+  all_summoner_names = participant_indentities.map((p) => {
+    return [p["player"]["summonerName"]];
+  });
+
+  if (side == null) {
+    return all_summoner_names;
+  } else if (side == "blue") {
+    return all_summoner_names.slice(0, 5);
+  } else {
+    return all_summoner_names.slice(5, 10);
+  }
 }
