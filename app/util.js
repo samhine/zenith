@@ -12,16 +12,20 @@ const SHORT_CALL_PERIOD = 1;
 const LONG_CALL_LIMIT = 100;
 const LONG_CALL_PERIOD = 120;
 
-function makeRiotApiCall(region, query, secret) {
-  // Cache service is shared across all script instances. Results saved per endpoint and platform.
-  // NOTE: This may require extended wait times for match history updates, summoner name changes, etc.
-  // var cache = CacheService.getScriptCache();
-  // var cached = cache.get("zenith-"+region+"-"+query.replace("/", "-"));
-  // Below conditions equate to cached respose being successful
-  // if (cached != null && !cached.hasOwnProperty("status")) {
-  //     return JSON.parse(cached);;
-  // }
+function getCurrentTimestamp() {
+  var d = new Date();
+  var ts = d.getTime();
+  return ts;
+}
 
+function makeHttpGetRequest(url) {
+  var response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+  var json = response.getContentText();
+  var data = JSON.parse(json);
+  return data;
+}
+
+function makeRiotApiCall(region, query, secret) {
   if (query.endsWith("&") || query.endsWith("?")) {
     var url =
       "https://" + region + ".api.riotgames.com" + query + "api_key=" + secret;
@@ -30,11 +34,15 @@ function makeRiotApiCall(region, query, secret) {
       "https://" + region + ".api.riotgames.com" + query + "?api_key=" + secret;
   }
 
-  var response = UrlFetchApp.fetch(url, { muteHttpExceptions: false });
-  var json = response.getContentText();
+  var data = makeHttpGetRequest(url);
 
-  // if (response.getResponseCode()==200) {
-  //     cache.put("zenith-"+region+"-"+query, json, 1500);
-  // }
-  return JSON.parse(json);
+  // Naive rate limiting. If waiting the short call period does not work, then just wait the long call period (minus the time we've already spent waiting).
+  if (data.hasOwnProperty("status") && data["status"]["status_code"] == 429) {
+    Utilities.sleep(SHORT_CALL_PERIOD * 1000);
+    var data = makeHttpGetRequest(url);
+    if (data.hasOwnProperty("status") && data["status"]["status_code"] == 429) {
+      Utilities.sleep((LONG_CALL_PERIOD - SHORT_CALL_PERIOD) * 1000);
+    }
+  }
+  return data;
 }
