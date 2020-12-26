@@ -157,13 +157,21 @@ function getStatForChampion(match_id, champion_name, statistic) {
  * @param {text} match_id
  * @param {text} summoner_name
  * @param {text} statistic
+ * @param {text|undefined} minute If included, return statistic for this minute. Not always availible.
  * @return {text} Statistic for summoner in provided match.
  * @customfunction
  */
 
-function getStatForSummoner(match_id, summoner_name, statistic) {
+function getStatForSummoner(match_id, summoner_name, statistic, minute) {
   if (match_id == null || summoner_name == null || statistic == null) {
     throw new Error("Missing field.");
+  }
+
+  timeline_stats = ["gold", "cs"];
+  if (minute != null && !timeline_stats.includes(statistic)) {
+    throw new Error(
+      "Statistic is not avalible across timeline. Remove `minute` argument."
+    );
   }
 
   try {
@@ -180,7 +188,31 @@ function getStatForSummoner(match_id, summoner_name, statistic) {
 
   participant_id = participantIdForSummoner(match_id, summoner_name);
 
-  return getStatisticForParticipant(match_data, participant_id, statistic);
+  if (minute == null) {
+    return getStatisticForParticipant(match_data, participant_id, statistic);
+  } else {
+    // Check game is long enough to support data at this minute
+    try {
+      var frames_at_minute =
+        timeline_data["frames"][minute]["participantFrames"];
+    } catch (err) {
+      if (err instanceof TypeError) {
+        throw new Error(
+          "Selected game does not have data available for minute" +
+            minute.toString()
+        );
+      } else {
+        throw err;
+      }
+    }
+
+    return getTimelineStatisticForParticipant(
+      timeline_data,
+      participant_id,
+      statistic,
+      minute
+    );
+  }
 }
 
 /**
@@ -201,7 +233,7 @@ function getStatisticForParticipant(match_data, participant_id, statistic) {
       return getDeathsForParticipant(match_data, participant_id);
     case "assists":
       return getAssistsForParticipant(match_data, participant_id);
-    case "totalGold":
+    case "gold":
       return getTotalGoldForParticipant(match_data, participant_id);
     case "goldPerMin":
       return getGoldPerMinForParticipant(match_data, participant_id);
@@ -219,6 +251,29 @@ function getStatisticForParticipant(match_data, participant_id, statistic) {
       return getKdrForParticipant(match_data, participant_id);
     default:
       throw new Error("Statistic not valid.");
+  }
+}
+
+function getTimelineStatisticForParticipant(
+  timeline_data,
+  participant_id,
+  statistic,
+  minute
+) {
+  switch (statistic) {
+    case "gold":
+      return getTimelineGoldForParticipant(
+        timeline_data,
+        participant_id,
+        minute
+      );
+    case "cs":
+      return getTimelineCsForParticipant(timeline_data, participant_id, minute);
+    default:
+      // Since we check before this method is called if statistic is in valid liist
+      throw new Error(
+        "Statistic not valid. You probably shouldn't see this error."
+      );
   }
 }
 
@@ -343,6 +398,29 @@ function getDamagePerMinForParticipant(match_data, participant_id) {
   minutes = match_data["gameDuration"] / 60;
   total_dmg = getDamageForParticipant(match_data, participant_id);
   return total_dmg / minutes;
+}
+
+function getTimelineGoldForParticipant(timeline_data, participant_id, minute) {
+  var frames_at_minute = timeline_data["frames"][minute]["participantFrames"];
+
+  for (var key in frames_at_minute) {
+    if (frames_at_minute[key]["participantId"] == participant_id) {
+      return frames_at_minute[key]["totalGold"];
+    }
+  }
+}
+
+function getTimelineCsForParticipant(timeline_data, participant_id, minute) {
+  var frames_at_minute = timeline_data["frames"][minute]["participantFrames"];
+
+  for (var key in frames_at_minute) {
+    if (frames_at_minute[key]["participantId"] == participant_id) {
+      return (
+        parseInt(frames_at_minute[key]["minionsKilled"]) +
+        parseInt(frames_at_minute[key]["jungleMinionsKilled"])
+      );
+    }
+  }
 }
 
 /**
