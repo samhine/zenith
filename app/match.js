@@ -213,6 +213,8 @@ function getStatisticForParticipant(match_data, participant_id, statistic) {
       return getDamageForParticipant(match_data, participant_id);
     case "damagePerMin":
       return getDamagePerMinForParticipant(match_data, participant_id);
+    case "kda":
+      return getKdaForParticipant(match_data, participant_id);
     case "kdr":
       return getKdrForParticipant(match_data, participant_id);
     default:
@@ -277,13 +279,23 @@ function getChampionForParticipant(match_data, participant_id) {
   return getChampionInfoById(champion_id)["name"];
 }
 
-function getKdrForParticipant(match_data, participant_id) {
+function getKdaForParticipant(match_data, participant_id) {
   return (
     getKillsForParticipant(match_data, participant_id) +
     "/" +
     getDeathsForParticipant(match_data, participant_id) +
     "/" +
     getAssistsForParticipant(match_data, participant_id)
+  );
+}
+
+function getKdrForParticipant(match_data, participant_id) {
+  var deaths = parseFloat(getDeathsForParticipant(match_data, participant_id));
+  deaths = deaths ? deaths : 1;
+  return (
+    (parseFloat(getKillsForParticipant(match_data, participant_id)) +
+      parseFloat(getDeathsForParticipant(match_data, participant_id))) /
+    parseFloat(deaths)
   );
 }
 

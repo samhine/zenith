@@ -90,3 +90,12 @@ Parses match for chosen statistic and returns it for given summoner.
 **statistic**: `text`, Parses match for chosen statistic and returns it for given summoner.
 
 **Returns**: `text`, Statistic for summoner in provided match.
+
+## Contributors and Contacts
+
+- Sam Hine
+
+  - twitter.com/samhine
+  - sam.hine27 (at) gmail.com
+
+- Chris Georgiou
