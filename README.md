@@ -2,6 +2,16 @@
 
 Google Sheets add-on to assist in use of Riot API.
 
+# Generating docs
+
+```
+cd app
+jsdox match.js
+jsdox summoner.js
+```
+
+Defaults into `output` directory.
+
 # Development and deployment
 
 This repository can be cloned using

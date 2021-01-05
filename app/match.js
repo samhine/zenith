@@ -115,16 +115,24 @@ function getTimelineByGameId(game_id) {
  * @param {text} match_id
  * @param {text} champion_name
  * @param {text} statistic
+ * @param {text|undefined} minute If included, return statistic for this minute. Not always availible.
  * @return {text} Statistic for champion in provided match.
  * @customfunction
  */
 
-function getStatForChampion(match_id, champion_name, statistic) {
+function getStatForChampion(match_id, champion_name, statistic, minute) {
   // Hint to correct formats?
   if (match_id == null || champion_name == null || statistic == null) {
     throw new Error("Missing field.");
   } else if (!CHAMPION_NAMES.includes(champion_name)) {
     throw new Error("Champion not found.");
+  }
+
+  timeline_stats = ["gold", "cs"];
+  if (minute != null && !timeline_stats.includes(statistic)) {
+    throw new Error(
+      "Statistic is not avalible across timeline. Remove `minute` argument."
+    );
   }
 
   try {
@@ -148,7 +156,32 @@ function getStatForChampion(match_id, champion_name, statistic) {
       throw err;
     }
   }
-  return getStatisticForParticipant(match_data, participant_id, statistic);
+
+  if (minute == null) {
+    return getStatisticForParticipant(match_data, participant_id, statistic);
+  } else {
+    // Check game is long enough to support data at this minute
+    try {
+      var frames_at_minute =
+        timeline_data["frames"][minute]["participantFrames"];
+    } catch (err) {
+      if (err instanceof TypeError) {
+        throw new Error(
+          "Selected game does not have data available for minute" +
+            minute.toString()
+        );
+      } else {
+        throw err;
+      }
+    }
+
+    return getTimelineStatisticForParticipant(
+      timeline_data,
+      participant_id,
+      statistic,
+      minute
+    );
+  }
 }
 
 /**
@@ -441,17 +474,19 @@ function getChampionListForMatch(match_id, side) {
   participant_data = match_data["participants"];
   if (side == null) {
     return participant_data.map((p) => {
-      return [getChampionInfoById(p["championId"])["name"]];
+      return [getChampionInfoById(p["championId"])["id"]];
     });
   }
 
   side_id = side == "blue" ? 100 : 200;
 
-  return participant_data.map((p) => {
-    if (p["teamId"] == side_id) {
-      return [getChampionInfoById(p["championId"])["name"]];
-    }
-  });
+  return participant_data
+    .map((p) => {
+      if (p["teamId"] == side_id) {
+        return [getChampionInfoById(p["championId"])["id"]];
+      }
+    })
+    .filter((el) => el != null);
 }
 
 /**
@@ -475,9 +510,19 @@ function getSummonerListForMatch(match_id, side) {
   //   all_summoner_names.push([participant_indentities[p]["summonerName"]]);
   // }
 
-  all_summoner_names = participant_indentities.map((p) => {
-    return [p["player"]["summonerName"]];
-  });
+  try {
+    all_summoner_names = participant_indentities.map((p) => {
+      return [p["player"]["summonerName"]];
+    });
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error(
+        "Cannot find summoner information, is this a custom match? If so this method is not available, use getChampionListForMatch instead."
+      );
+    } else {
+      throw err;
+    }
+  }
 
   if (side == null) {
     return all_summoner_names;
