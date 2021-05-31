@@ -248,6 +248,59 @@ function getStatForSummoner(match_id, summoner_name, statistic, minute) {
   }
 }
 
+function getStatForAccountId(match_id, account_id, statistic, minute) {
+  if (match_id == null || account_id == null || statistic == null) {
+    throw new Error("Missing field.");
+  }
+
+  timeline_stats = ["gold", "cs"];
+  if (minute != null && !timeline_stats.includes(statistic)) {
+    throw new Error(
+      "Statistic is not avalible across timeline. Remove `minute` argument."
+    );
+  }
+
+  try {
+    match_data = getMatchByGameId(match_id);
+  } catch (err) {
+    throw new Error("Error getting match data:" + err.toString());
+  }
+
+  try {
+    timeline_data = getTimelineByGameId(match_id);
+  } catch (err) {
+    throw new Error("Error getting timeline data:" + err.toString());
+  }
+
+  participant_id = participantIdForAccountId(match_id, account_id);
+
+  if (minute == null) {
+    return getStatisticForParticipant(match_data, participant_id, statistic);
+  } else {
+    // Check game is long enough to support data at this minute
+    try {
+      var frames_at_minute =
+        timeline_data["frames"][minute]["participantFrames"];
+    } catch (err) {
+      if (err instanceof TypeError) {
+        throw new Error(
+          "Selected game does not have data available for minute" +
+            minute.toString()
+        );
+      } else {
+        throw err;
+      }
+    }
+
+    return getTimelineStatisticForParticipant(
+      timeline_data,
+      participant_id,
+      statistic,
+      minute
+    );
+  }
+}
+
 /**
  * Parses match for chosen statistic and returns it for given participant.
  *
@@ -343,9 +396,30 @@ function participantIdForChampion(match_id, champion_name) {
   match_data = getMatchByGameId(match_id);
   champion_id = getChampionInfoByName(champion_name)["key"];
 
-  return match_data["participants"].find(
+  participant_info = match_data["participants"].find(
     (player) => player["championId"] == champion_id
-  )["participantId"];
+  );
+
+  if (participant_info == undefined) {
+    throw new Error("Champion not found in match");
+  }
+
+  return participant_info["participantId"];
+}
+
+function participantIdForAccountId(match_id, account_id) {
+  match_data = getMatchByGameId(match_id);
+  champion_id = getChampionInfoByName(champion_name)["key"];
+
+  participant_info = match_data["participantIdentities"].find(
+    (player) => player["player"]["currentAccountId"] == account_id
+  );
+
+  if (participant_info == undefined) {
+    throw new Error("Account ID not found in match");
+  }
+
+  return participant_info["participantId"];
 }
 
 /**

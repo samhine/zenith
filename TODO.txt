@@ -1,1 +1,2 @@
-
+- StatByAccountId docs
+- Custom rate limits in Credentials tab (4 values)
